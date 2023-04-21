@@ -13,3 +13,7 @@ jobs:
       - checkout
       - run: yarn install --immutable --immutable-cache
       - run: yarn dedupe --check
+
+      - add_ssh_keys:
+          fingerprints:
+            - "d4:61:65:f4:81:95:e4:03:30:e4:c0:e7:f5:7b:b7:c3"
