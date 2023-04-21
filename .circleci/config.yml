@@ -13,7 +13,9 @@ jobs:
       - checkout
       - run: yarn install --immutable --immutable-cache
       - run: yarn dedupe --check
-
+      - run: ./.circleci/install-ipfs.sh
       - add_ssh_keys:
           fingerprints:
-            - "d4:61:65:f4:81:95:e4:03:30:e4:c0:e7:f5:7b:b7:c3"
+            - "35:3e:32:54:6a:22:d8:31:26:84:ae:50:ef:a9:6f:00"
+      - run: ipfs key import synthetix --format=pem-pkcs8-cleartext ~/.ssh/id_rsa_353e32546a22d8312684ae50efa96f00
+      - run: IPNS_KEY=synthetix node bin.mjs "QmW9jfZpEezUkAxWpRrdLuDi2JAZFu72acLHAmwpk3edtw"
