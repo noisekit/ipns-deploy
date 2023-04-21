@@ -1,0 +1,28 @@
+{
+  "name": "@noisekit/ipns-deploy",
+  "version": "0.0.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "index.mjs",
+  "files": [
+    ".env.template",
+    "bin.mjs",
+    "deploy.mjs",
+    "index.mjs",
+    "LICENSE",
+    "package.json",
+    "README.md"
+  ],
+  "type": "module",
+  "bin": "bin.mjs",
+  "repository": "noisekit/ipns-deploy",
+  "author": "Noisekit <noisekit@proton.me>",
+  "license": "MIT",
+  "dependencies": {
+    "debug": "^4.3.4",
+    "dotenv": "^16.0.3",
+    "ipfs-http-client": "^60.0.0"
+  },
+  "packageManager": "yarn@3.5.0"
+}
