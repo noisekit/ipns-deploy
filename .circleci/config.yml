@@ -14,17 +14,25 @@ jobs:
       - run: yarn install --immutable --immutable-cache
       - run: yarn dedupe --check
       - run: ./.circleci/install-ipfs.sh
+      - run:
+          command: ipfs daemon
+          background: true
+      - run: wget --retry-connrefused --waitretry=20 --read-timeout=20 --timeout=15 -t 10 --post-data '' localhost:5001/api/v0/key/list
       - run: openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out test-deploy-key.pem -outform PEM
-      - run: |
-          echo '> ipfs key import test-deploy-key --format=pem-pkcs8-cleartext ./test-deploy-key.pem'
-          export IPNS_KEY=$(ipfs key import test-deploy-key --format=pem-pkcs8-cleartext ./test-deploy-key.pem)
-          echo "export IPNS_KEY=$IPNS_KEY"
-          echo "export IPNS_KEY=$IPNS_KEY" >> $BASH_ENV
+      - run: echo "export IPNS_KEY=$(ipfs key import test-deploy-key --format=pem-pkcs8-cleartext ./test-deploy-key.pem)" >> $BASH_ENV
+      - run: echo $IPNS_KEY
       - run: ipfs key list -l
-      - run: |
-          echo '> yarn test-deploy'
-          export IPFS_CID=$(yarn test-deploy)
-          echo "export IPFS_CID=$IPFS_CID"
-          echo "export IPFS_CID=$IPFS_CID" >> $BASH_ENV
-      - run: yarn start test-deploy-key $IPFS_CID
-      - run: curl -s "http://$IPNS_KEY.ipns.localhost:8080" | grep '<h1>Hello!</h1>'
+      - run: echo "export IPFS_CID=$(yarn test-deploy)" >> $BASH_ENV
+      - run: echo $IPFS_CID
+
+      - run:
+          environment:
+            DEBUG: ipfs-deploy
+            IPFS_HOST: localhost
+            IPFS_PORT: 5001
+            IPFS_PROTOCOL: http
+            IPFS_USER: ""
+            IPFS_PASS: ""
+          command: node ./bin.mjs test-deploy-key $IPFS_CID
+      - run: curl -L -v "http://127.0.0.1:8080/ipns/$IPNS_KEY"
+      - run: curl -L -s "http://127.0.0.1:8080/ipns/$IPNS_KEY" | grep '<h1>Hello!</h1>'
