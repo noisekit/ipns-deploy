@@ -3,7 +3,7 @@ version: 2.1
 parameters:
   node-version:
     type: string
-    default: '16.17.0'
+    default: "16.17.0"
 
 jobs:
   build:
@@ -14,8 +14,17 @@ jobs:
       - run: yarn install --immutable --immutable-cache
       - run: yarn dedupe --check
       - run: ./.circleci/install-ipfs.sh
-      - add_ssh_keys:
-          fingerprints:
-            - "35:3e:32:54:6a:22:d8:31:26:84:ae:50:ef:a9:6f:00"
-      - run: ipfs key import synthetix --format=pem-pkcs8-cleartext ~/.ssh/id_rsa_353e32546a22d8312684ae50efa96f00
-      - run: IPNS_KEY=synthetix node bin.mjs "QmW9jfZpEezUkAxWpRrdLuDi2JAZFu72acLHAmwpk3edtw"
+      - run: openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out test-deploy-key.pem -outform PEM
+      - run: |
+          echo '> ipfs key import test-deploy-key --format=pem-pkcs8-cleartext ./test-deploy-key.pem'
+          export IPNS_KEY=$(ipfs key import test-deploy-key --format=pem-pkcs8-cleartext ./test-deploy-key.pem)
+          echo "export IPNS_KEY=$IPNS_KEY"
+          echo "export IPNS_KEY=$IPNS_KEY" >> $BASH_ENV
+      - run: ipfs key list -l
+      - run: |
+          echo '> yarn test-deploy'
+          export IPFS_CID=$(yarn test-deploy)
+          echo "export IPFS_CID=$IPFS_CID"
+          echo "export IPFS_CID=$IPFS_CID" >> $BASH_ENV
+      - run: yarn start test-deploy-key $IPFS_CID
+      - run: curl -s "http://$IPNS_KEY.ipns.localhost:8080" | grep '<h1>Hello!</h1>'

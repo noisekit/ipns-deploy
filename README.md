@@ -1,43 +1,76 @@
 # ipns-deploy
 
+`ipns-deploy` is a command-line utility for publishing IPFS content identifiers (CIDs) to IPNS keys. It is designed to work in conjunction with `ipfs-deploy`, which uploads files and returns the corresponding CID. 
+
+By using `ipns-deploy` together with `ipfs-deploy`, you can publish your uploaded files' CID to an IPNS key, making it easier to manage and share your content on IPFS.
 
 
-## Setting up IPNS keys
+## Install
 
-NOTE: `ipfs` is expected to be installed and initialised
+```sh
+npm install -g @noisekit/ipns-deploy
+```
+
+## ENV
+
+Configure the environment variables with your IPFS cluster credentials and settings.
+
+```sh
+IPFS_HOST=ipfs.synthetix.io
+IPFS_PORT=443
+IPFS_PROTOCOL=https
+IPFS_USER=
+IPFS_PASS=
+```
+
+## CLI
+
+Usage and examples
+
+```sh
+# Publish a CID to an IPNS key
+# Usage: ipns-deploy KEY CID
+
+# Example: Publish the CID obtained from ipfs-deploy to the 'staking.synthetix.eth' IPNS key
+ipns-deploy "staking.synthetix.eth" QmAbCdEf1234567890
+
+# Publish a CID obtained from an `ipfs-deploy` execution to the 'staking.synthetix.eth' IPNS key
+export IPFS_CID=$(ipfs-deploy ./public)
+ipns-deploy "staking.synthetix.eth" "$IPFS_CID"
+
+# DEBUG mode to view additional information
+DEBUG=ipns-deploy ipns-deploy "staking.synthetix.eth" QmXyZaBc1234567890
+```
+
+## IPNS Keys management
+
+If the IPNS key was not added to the IPFS server it needs to be added first.
+
+*NOTE*: This needs to be executed on the remote IPFS Cluster server
 
 1. Generate PEM PKCS8 key
 
     ```sh
-    openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out synthetix.pem -outform PEM
+    openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out staking.synthetix.eth -outform PEM
     ```
 
-2. Add PEM to CI in `Project Settings` -> `SSH Keys` -> `Additional SSH Keys` and copy fingerprint (e.g. `35:3e:32:54:6a:22:d8:31:26:84:ae:50:ef:a9:6f:00`)
+2. Import the key
 
     ```sh
-    ssh-keygen -e -m PKCS8 -f synthetix.pem
-    ```
-
-3. Add SHH key by fingerprint in config
-
-    ```yaml
-      - add_ssh_keys:
-          fingerprints:
-            - "35:3e:32:54:6a:22:d8:31:26:84:ae:50:ef:a9:6f:00"
-    ```
-
-4. Add IPNS key
-
-    ```sh
-   # Note that fingerprint is used as part of key file name
-   ipfs key import synthetix --format=pem-pkcs8-cleartext ~/.ssh/id_rsa_353e32546a22d8312684ae50efa96f00
+   ipfs key import staking.synthetix.eth --format=pem-pkcs8-cleartext staking.synthetix.eth
    
    # This returns the key ID (IPNS name)
-   # k2k4r8konodshfk5z7ldevnry88x3epurmmul13vs28v6b80y54ipupu
+   # k2k4r8jvf8qlg4ytq7y3ta749vkjzms0hisd9i92ohk0lsp0yestbhy3
    ```
 
-5. Now we can use IPNS key with name `synthetix` to publish to IPNS
+3. Check all the keys added
 
-    ```js
-   await ipfs.name.publish(cid, { key: 'synthetix' })
+    ```sh
+   ipfs key list
+   ```
+
+4. Check the IPNS URL can be resolved
+
+    ```sh
+   curl http://k2k4r8jvf8qlg4ytq7y3ta749vkjzms0hisd9i92ohk0lsp0yestbhy3.ipns.localhost:8080/
    ```

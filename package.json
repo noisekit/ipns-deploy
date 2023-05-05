@@ -19,10 +19,17 @@
   "repository": "noisekit/ipns-deploy",
   "author": "Noisekit <noisekit@proton.me>",
   "license": "MIT",
+  "scripts": {
+    "start": "DEBUG=ipns-deploy node ./bin.mjs",
+    "test-deploy": "ipfs-deploy ./test"
+  },
   "dependencies": {
     "debug": "^4.3.4",
     "dotenv": "^16.0.3",
     "ipfs-http-client": "^60.0.0"
+  },
+  "devDependencies": {
+    "@noisekit/ipfs-deploy": "^1.0.3"
   },
   "packageManager": "yarn@3.5.0"
 }

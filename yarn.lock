@@ -174,10 +174,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@noisekit/ipfs-deploy@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@noisekit/ipfs-deploy@npm:1.0.3"
+  dependencies:
+    debug: ^4.3.4
+    dotenv: ^16.0.3
+    ipfs-http-client: ^60.0.0
+  bin:
+    ipfs-deploy: bin.mjs
+  checksum: 14a871767621560caee1a7882dd42e11f45bb95662aa709bb06b9f141099160457fc43687b489a2a892669b9cada3b077159186c1c4596b50c616624dcc64bc6
+  languageName: node
+  linkType: hard
+
 "@noisekit/ipns-deploy@workspace:.":
   version: 0.0.0-use.local
   resolution: "@noisekit/ipns-deploy@workspace:."
   dependencies:
+    "@noisekit/ipfs-deploy": ^1.0.3
     debug: ^4.3.4
     dotenv: ^16.0.3
     ipfs-http-client: ^60.0.0
